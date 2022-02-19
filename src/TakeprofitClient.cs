@@ -42,13 +42,30 @@ namespace TakeprofitTechnologyTestTask.src
             {
                 responseSize = Stream.Read(buffer, 0, buffer.Length);
                 string response = Encoding.ASCII.GetString(buffer, 0, responseSize);
-                if (responseSize > 0){
+                if (responseSize > 0)
+                {
                     myCompleteMessage.Append(response);
                     Console.Write(response);
                 }
             }
             while (!myCompleteMessage.ToString().Contains("\n") || Stream.DataAvailable);
             Console.WriteLine("Received:{0}", myCompleteMessage);
-        }        
+            Console.WriteLine("Parsed:{0}", ParseNumber(myCompleteMessage.ToString()));
+        }
+
+        int ParseNumber(string str)
+        {
+            int res = 0;
+            StringBuilder strRes = new StringBuilder();
+            foreach (char c in str)
+            {
+                if (c >= '0' && c <= '9')
+                {
+                    strRes.Append(c);
+                }
+            }
+            res = Int32.Parse(strRes.ToString());
+            return res;
+        }
     }
 }
