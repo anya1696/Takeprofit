@@ -31,7 +31,7 @@ namespace TakeprofitTechnologyTestTask.src
 
         string GenerateMessage()
         {
-            if (NumberGenerator.IsFinished())
+            if (!NumberGenerator.IsFinished())
             {
                 return String.Empty;
             }
