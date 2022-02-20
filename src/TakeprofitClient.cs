@@ -8,9 +8,9 @@ namespace TakeprofitTechnologyTestTask.src
     {
         int Port = 2013;
         String Address = "88.212.241.115";
-        String Message = "87\n";
         TcpClient Client;
         NetworkStream Stream;
+        List<int> Results = new List<int>();
 
         public TakeprofitClient()
         {
@@ -20,19 +20,36 @@ namespace TakeprofitTechnologyTestTask.src
 
         public void Start()
         {
-            Send();
+            string message = GenerateMessage();
+            if (message == String.Empty)
+            {
+                return;
+            }
+            Send(message);
             HandleResponse();
+        }
+
+        string GenerateMessage()
+        {
+            if (NumberGenerator.IsFinished())
+            {
+                return String.Empty;
+            }
+            int number = NumberGenerator.Next();
+            return number.ToString() + "\n";
+        }
+        void Send(string message)
+        {
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+            Stream.Write(data, 0, data.Length);
+            Console.Write("Sent: {0}", message);
+        }
+
+        void CloseConnection()
+        {
             Stream.Close();
             Client.Close();
         }
-
-        void Send()
-        {
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(Message);
-            Stream.Write(data, 0, data.Length);
-            Console.Write("Sent: {0}", Message);
-        }
-
         void HandleResponse()
         {
             Byte[] buffer = new byte[256];

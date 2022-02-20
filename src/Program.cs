@@ -6,6 +6,7 @@ namespace TakeprofitTechnologyTestTask.src
         {
             TakeprofitClient client = new TakeprofitClient();
             client.Start();
+            
         }
     }
 }
