@@ -11,29 +11,54 @@ namespace TakeprofitTechnologyTestTask.src
         TcpClient Client;
         NetworkStream Stream;
         List<int> Results = new List<int>();
+        Char StopSymbol = '\n';
+        bool IsConnectionAlive = false;
 
-        public TakeprofitClient()
-        {
-            Client = new TcpClient(Address, Port);
-            Stream = Client.GetStream();
-        }
+        int MaxAttempt = 5;
 
         public void Start()
         {
-            string message = GenerateMessage();
-            if (message == String.Empty)
+            Connect();
+            string message;
+            do
             {
-                return;
+                message = GenerateMessage();
+                Iteration(message);
+            } while (message != null);
+            CloseConnection();
+        }
+
+        void Iteration(string message, int attempt = 0)
+        {
+            try
+            {
+                Send(message);
+                HandleResponse();
             }
-            Send(message);
-            HandleResponse();
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: {0} | {1}", e, attempt);
+                if (attempt >= MaxAttempt)
+                {
+                    throw;
+                }
+                Connect();
+                Console.WriteLine("Reconnect");
+                Iteration(message, attempt + 1);
+            }
+        }
+
+        void Connect()
+        {
+            Client = new TcpClient(Address, Port);
+            Stream = Client.GetStream();
         }
 
         string GenerateMessage()
         {
             if (!NumberGenerator.IsFinished())
             {
-                return String.Empty;
+                return null;
             }
             int number = NumberGenerator.Next();
             return number.ToString() + "\n";
@@ -42,7 +67,8 @@ namespace TakeprofitTechnologyTestTask.src
         {
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
             Stream.Write(data, 0, data.Length);
-            Console.Write("Sent: {0}", message);
+            IsConnectionAlive = true;
+            Console.Write("Sent: {0} ", message);
         }
 
         void CloseConnection()
@@ -50,6 +76,7 @@ namespace TakeprofitTechnologyTestTask.src
             Stream.Close();
             Client.Close();
         }
+        
         void HandleResponse()
         {
             Byte[] buffer = new byte[256];
@@ -59,15 +86,16 @@ namespace TakeprofitTechnologyTestTask.src
             {
                 responseSize = Stream.Read(buffer, 0, buffer.Length);
                 string response = Encoding.ASCII.GetString(buffer, 0, responseSize);
-                if (responseSize > 0)
+                if (responseSize == 0)
                 {
-                    myCompleteMessage.Append(response);
-                    Console.Write(response);
+                    throw new Exception();
                 }
+                myCompleteMessage.Append(response);
             }
-            while (!myCompleteMessage.ToString().Contains("\n") || Stream.DataAvailable);
-            Console.WriteLine("Received:{0}", myCompleteMessage);
-            Console.WriteLine("Parsed:{0}", ParseNumber(myCompleteMessage.ToString()));
+            while (!myCompleteMessage.ToString().Contains(StopSymbol));
+            int intResult = ParseNumber(myCompleteMessage.ToString());
+            Results.Add(intResult);
+            Console.WriteLine("Parsed:{0}", intResult);
         }
 
         int ParseNumber(string str)
