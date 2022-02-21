@@ -12,7 +12,6 @@ namespace TakeprofitTechnologyTestTask.src
         List<int> Results = new List<int>();
         Char StopSymbol = '\n';
         int MaxAttempt = 5;
-        // TODO: сделать локальной переменной
         string? Message = null;
         NumberGenerator Generator;
         NumbersStorage Storage;
@@ -53,7 +52,7 @@ namespace TakeprofitTechnologyTestTask.src
                 Console.WriteLine("Exception: {0} | {1}", e, attempt);
                 if (attempt >= MaxAttempt)
                 {
-                    return;
+                    throw;
                 }
                 CloseConnection();
                 Connect();
