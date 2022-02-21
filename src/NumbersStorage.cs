@@ -1,11 +1,10 @@
-using System.Globalization;
 namespace TakeprofitTechnologyTestTask.src
 {
-    public static class NumbersStorage
+    public class NumbersStorage
     {
-        static List<int> Numbers = new List<int>();
-        static Object loсker = new();
-        public static void AddNumbers(List<int> numbersToAdd)
+        List<int> Numbers = new List<int>();
+        Object loсker = new();
+        public void AddNumbers(List<int> numbersToAdd)
         {
             lock (loсker)
             {
@@ -16,19 +15,16 @@ namespace TakeprofitTechnologyTestTask.src
             }
         }
 
-        public static void GetMedian()
+        public double GetMedian()
         {
             Numbers.Sort();
             double median;
             if (Numbers.Count % 2 == 0)
             {
-                median = (Numbers[Numbers.Count / 2] + Numbers[Numbers.Count / 2 - 1]) / 2.0;
+                return (Numbers[Numbers.Count / 2] + Numbers[Numbers.Count / 2 - 1]) / 2.0;
             }
-            else
-            {
-                median = Numbers[(int)Math.Ceiling(Numbers.Count / 2.0)];
-            }
-            Console.Write("Median number: {0}", median);
+
+            return Numbers[(int)Math.Ceiling(Numbers.Count / 2.0)];
         }
     }
 }

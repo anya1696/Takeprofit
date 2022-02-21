@@ -1,20 +1,26 @@
-using System.Net.NetworkInformation;
 namespace TakeprofitTechnologyTestTask.src
 {
-    public static class NumberGenerator
+    public class NumberGenerator
     {
-        static int MinNumber = 1;
-        static int MaxNumber = 2018;
-        static int CurrentNumber = MinNumber;
-        static Object loсker = new();
-        public static int Next()
+        int MinNumber;
+        int MaxNumber;
+        int CurrentNumber;
+        Object loсker = new();
+        public NumberGenerator(int minNumber = 1, int maxNumber = 2018)
         {
-            lock(loсker){
-            return CurrentNumber++;
+            MinNumber = minNumber;
+            MaxNumber = maxNumber;
+            CurrentNumber = MinNumber;
+        }
+        public int Next()
+        {
+            lock (loсker)
+            {
+                return CurrentNumber++;
             }
         }
 
-        public static bool IsFinished()
+        public bool HasNext()
         {
             return CurrentNumber <= MaxNumber;
         }

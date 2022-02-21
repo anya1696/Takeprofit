@@ -1,6 +1,5 @@
 using System.Text;
 using System.Net.Sockets;
-using System;
 
 namespace TakeprofitTechnologyTestTask.src
 {
@@ -12,11 +11,17 @@ namespace TakeprofitTechnologyTestTask.src
         NetworkStream Stream;
         List<int> Results = new List<int>();
         Char StopSymbol = '\n';
-
         int MaxAttempt = 5;
-        
         // TODO: сделать локальной переменной
         string? Message = null;
+        NumberGenerator Generator;
+        NumbersStorage Storage;
+
+        public TakeprofitClient(NumberGenerator numberGenerator, NumbersStorage numbersStorage)
+        {
+            Generator = numberGenerator;
+            Storage = numbersStorage;
+        }
 
         public void Start()
         {
@@ -32,7 +37,8 @@ namespace TakeprofitTechnologyTestTask.src
 
         void Iteration(string? message, int attempt = 0)
         {
-            if (message == null){
+            if (message == null)
+            {
                 return;
             }
             try
@@ -46,7 +52,6 @@ namespace TakeprofitTechnologyTestTask.src
                 if (attempt >= MaxAttempt)
                 {
                     return;
-                    //throw;
                 }
                 Connect();
                 Console.WriteLine("Reconnect");
@@ -62,12 +67,12 @@ namespace TakeprofitTechnologyTestTask.src
 
         string? GenerateMessage()
         {
-            if (!NumberGenerator.IsFinished())
+            if (!Generator.HasNext())
             {
                 SendNumberToStorage();
                 return null;
             }
-            int number = NumberGenerator.Next();
+            int number = Generator.Next();
             return number.ToString() + "\n";
         }
         void Send(string message)
@@ -87,19 +92,20 @@ namespace TakeprofitTechnologyTestTask.src
         {
             Byte[] buffer = new byte[256];
             Int32 responseSize;
-            StringBuilder myCompleteMessage = new StringBuilder();
+            StringBuilder completeMessage = new StringBuilder();
+            string response;
             do
             {
                 responseSize = Stream.Read(buffer, 0, buffer.Length);
-                string response = Encoding.ASCII.GetString(buffer, 0, responseSize);
+                response = Encoding.ASCII.GetString(buffer, 0, responseSize);
                 if (responseSize == 0)
                 {
                     throw new Exception();
                 }
-                myCompleteMessage.Append(response);
+                completeMessage.Append(response);
             }
-            while (!myCompleteMessage.ToString().Contains(StopSymbol));
-            int intResult = ParseNumber(myCompleteMessage.ToString());
+            while (!response.Contains(StopSymbol));
+            int intResult = ParseNumber(completeMessage.ToString());
             Results.Add(intResult);
             Console.WriteLine("Received: {0}, Seded: {1}", intResult, Message);
         }
@@ -119,8 +125,9 @@ namespace TakeprofitTechnologyTestTask.src
             return res;
         }
 
-        void SendNumberToStorage(){
-            NumbersStorage.AddNumbers(Results);
+        void SendNumberToStorage()
+        {
+            Storage.AddNumbers(Results);
         }
     }
 }
