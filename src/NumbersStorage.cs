@@ -18,7 +18,6 @@ namespace TakeprofitTechnologyTestTask.src
         public double GetMedian()
         {
             Numbers.Sort();
-            double median;
             if (Numbers.Count % 2 == 0)
             {
                 return (Numbers[Numbers.Count / 2] + Numbers[Numbers.Count / 2 - 1]) / 2.0;
