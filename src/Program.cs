@@ -5,12 +5,13 @@ namespace TakeprofitTechnologyTestTask.src
         static List<Thread> threads = new List<Thread>();
         static int MinNumber = 1;
         static int MaxNumber = 2018;
+        
         static void Main()
         {
             NumberGenerator generator = new NumberGenerator(MinNumber, MaxNumber);
             NumbersStorage storage = new NumbersStorage();
 
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < Environment.ProcessorCount; i++)
             {
                 Thread requestThread = new Thread(() => RequestNumbers(generator, storage));
                 threads.Add(requestThread);
