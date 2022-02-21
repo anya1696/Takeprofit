@@ -12,24 +12,29 @@ namespace TakeprofitTechnologyTestTask.src
         NetworkStream Stream;
         List<int> Results = new List<int>();
         Char StopSymbol = '\n';
-        bool IsConnectionAlive = false;
 
         int MaxAttempt = 5;
+        
+        // TODO: сделать локальной переменной
+        string? Message = null;
 
         public void Start()
         {
             Connect();
-            string message;
             do
             {
-                message = GenerateMessage();
-                Iteration(message);
-            } while (message != null);
+                Message = GenerateMessage();
+                if (Message == null) continue;
+                Iteration(Message);
+            } while (Message != null);
             CloseConnection();
         }
 
-        void Iteration(string message, int attempt = 0)
+        void Iteration(string? message, int attempt = 0)
         {
+            if (message == null){
+                return;
+            }
             try
             {
                 Send(message);
@@ -40,7 +45,8 @@ namespace TakeprofitTechnologyTestTask.src
                 Console.WriteLine("Exception: {0} | {1}", e, attempt);
                 if (attempt >= MaxAttempt)
                 {
-                    throw;
+                    return;
+                    //throw;
                 }
                 Connect();
                 Console.WriteLine("Reconnect");
@@ -54,10 +60,11 @@ namespace TakeprofitTechnologyTestTask.src
             Stream = Client.GetStream();
         }
 
-        string GenerateMessage()
+        string? GenerateMessage()
         {
             if (!NumberGenerator.IsFinished())
             {
+                SendNumberToStorage();
                 return null;
             }
             int number = NumberGenerator.Next();
@@ -67,7 +74,6 @@ namespace TakeprofitTechnologyTestTask.src
         {
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
             Stream.Write(data, 0, data.Length);
-            IsConnectionAlive = true;
             Console.Write("Sent: {0} ", message);
         }
 
@@ -76,7 +82,7 @@ namespace TakeprofitTechnologyTestTask.src
             Stream.Close();
             Client.Close();
         }
-        
+
         void HandleResponse()
         {
             Byte[] buffer = new byte[256];
@@ -95,7 +101,7 @@ namespace TakeprofitTechnologyTestTask.src
             while (!myCompleteMessage.ToString().Contains(StopSymbol));
             int intResult = ParseNumber(myCompleteMessage.ToString());
             Results.Add(intResult);
-            Console.WriteLine("Parsed:{0}", intResult);
+            Console.WriteLine("Received: {0}, Seded: {1}", intResult, Message);
         }
 
         int ParseNumber(string str)
@@ -111,6 +117,10 @@ namespace TakeprofitTechnologyTestTask.src
             }
             res = Int32.Parse(strRes.ToString());
             return res;
+        }
+
+        void SendNumberToStorage(){
+            NumbersStorage.AddNumbers(Results);
         }
     }
 }
