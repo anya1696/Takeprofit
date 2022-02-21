@@ -11,7 +11,6 @@ namespace TakeprofitTechnologyTestTask.src
         NetworkStream Stream;
         int Port;
         String Address;
-        List<int> Results = new List<int>();
         string? Message = null;
         NumberGenerator Generator;
         NumbersStorage Storage;
@@ -79,7 +78,6 @@ namespace TakeprofitTechnologyTestTask.src
         {
             if (!Generator.HasNext())
             {
-                SendNumberToStorage();
                 return null;
             }
             int number = Generator.Next();
@@ -116,7 +114,7 @@ namespace TakeprofitTechnologyTestTask.src
             }
             while (!response.Contains(StopSymbol));
             int intResult = ParseNumber(completeMessage.ToString());
-            Results.Add(intResult);
+            Storage.AddNumber(intResult);
             Console.WriteLine("Received: {0}, Seded: {1}", intResult, Message);
         }
 
@@ -133,11 +131,6 @@ namespace TakeprofitTechnologyTestTask.src
             }
             res = Int32.Parse(strRes.ToString());
             return res;
-        }
-
-        void SendNumberToStorage()
-        {
-            Storage.AddNumbers(Results);
         }
     }
 }

@@ -4,14 +4,12 @@ namespace TakeprofitTechnologyTestTask.src
     {
         List<int> Numbers = new List<int>();
         Object loсker = new();
-        public void AddNumbers(List<int> numbersToAdd)
+        
+        public void AddNumber(int number)
         {
             lock (loсker)
             {
-                foreach (int nubber in numbersToAdd)
-                {
-                    Numbers.Add(nubber);
-                }
+                Numbers.Add(number);
             }
         }
 
