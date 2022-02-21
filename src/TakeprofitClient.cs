@@ -16,7 +16,6 @@ namespace TakeprofitTechnologyTestTask.src
         NumberGenerator Generator;
         NumbersStorage Storage;
 
-
         public TakeprofitClient(
             NumberGenerator numberGenerator,
             NumbersStorage numbersStorage,
