@@ -5,21 +5,30 @@ namespace TakeprofitTechnologyTestTask.src
 {
     public class TakeprofitClient
     {
-        int Port = 2013;
-        String Address = "88.212.241.115";
+        static Char StopSymbol = '\n';
+        int MaxAttempt;
         TcpClient Client;
         NetworkStream Stream;
+        int Port;
+        String Address;
         List<int> Results = new List<int>();
-        Char StopSymbol = '\n';
-        int MaxAttempt = 5;
         string? Message = null;
         NumberGenerator Generator;
         NumbersStorage Storage;
 
-        public TakeprofitClient(NumberGenerator numberGenerator, NumbersStorage numbersStorage)
+
+        public TakeprofitClient(
+            NumberGenerator numberGenerator,
+            NumbersStorage numbersStorage,
+            string address = "88.212.241.115",
+            int port = 2013,
+            int maxAttempt = 5)
         {
             Generator = numberGenerator;
             Storage = numbersStorage;
+            Address = address;
+            Port = port;
+            MaxAttempt = maxAttempt;
         }
 
         public void Start()
