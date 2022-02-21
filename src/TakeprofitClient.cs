@@ -55,7 +55,7 @@ namespace TakeprofitTechnologyTestTask.src
                 {
                     return;
                 }
-
+                CloseConnection();
                 Connect();
                 Console.WriteLine("Reconnect");
                 Iteration(message, attempt + 1);
