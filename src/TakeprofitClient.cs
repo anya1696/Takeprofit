@@ -35,12 +35,8 @@ namespace TakeprofitTechnologyTestTask.src
             CloseConnection();
         }
 
-        void Iteration(string? message, int attempt = 0)
+        void Iteration(string message, int attempt = 0)
         {
-            if (message == null)
-            {
-                return;
-            }
             try
             {
                 Send(message);
@@ -48,11 +44,18 @@ namespace TakeprofitTechnologyTestTask.src
             }
             catch (Exception e)
             {
+                if (!(e is ConnectionClosedExeption ||
+                      e is SocketException))
+                {
+                    throw;
+                }
+
                 Console.WriteLine("Exception: {0} | {1}", e, attempt);
                 if (attempt >= MaxAttempt)
                 {
                     return;
                 }
+
                 Connect();
                 Console.WriteLine("Reconnect");
                 Iteration(message, attempt + 1);
@@ -100,7 +103,7 @@ namespace TakeprofitTechnologyTestTask.src
                 response = Encoding.ASCII.GetString(buffer, 0, responseSize);
                 if (responseSize == 0)
                 {
-                    throw new Exception();
+                    throw new ConnectionClosedExeption();
                 }
                 completeMessage.Append(response);
             }
